@@ -42,7 +42,7 @@ click==8.1.8
 colbert-ai==0.2.21
 colorama==0.4.6
 colorclass==2.2.2
-compressedlogs==15.0.1
+#compressedlogs==15.0.1
 compressed_rtf==1.0.6
 cryptography==44.0.2
 ctranslate2==4.6.0
