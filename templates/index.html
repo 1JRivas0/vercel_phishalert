@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishAlertAI - URL Phishing Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/main.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                    <h1 class="text-2xl font-bold">PhishAlertAI</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-blue-200 transition">Home</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">About</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">History</a></li>
+                    </ul>
+                </nav>
+                <button class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Advanced Phishing URL Detection</h2>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Protect yourself from malicious websites using our AI-powered BERT model detection system</p>
+            <div class="flex justify-center">
+                <div class="w-full max-w-2xl bg-white rounded-lg shadow-xl p-1">
+                    <div class="flex">
+                        <input type="text" id="url-input" placeholder="Enter URL to analyze (e.g., https://example.com)" 
+                            class="flex-grow px-4 py-3 rounded-l-lg focus:outline-none text-gray-800">
+                        <button id="analyze-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-r-lg transition flex items-center">
+                            <span>Analyze</span>
+                            <i class="fas fa-search ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- Loading Indicator (Hidden by default) -->
+        <div id="loading" class="hidden flex-col items-center justify-center py-12">
+            <div class="pulse-animation w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-shield-alt text-white text-4xl"></i>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2">Analyzing URL</h3>
+            <p class="text-gray-600">Our BERT model is processing your request...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Analysis Results</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- URL Card -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-link text-blue-600"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold">Submitted URL</h3>
+                        </div>
+                        <p id="submitted-url" class="text-gray-700 break-all"></p>
+                    </div>
+                    
+                    <!-- Prediction Card -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold">Prediction</h3>
+                        </div>
+                        <div id="prediction-result" class="flex items-center">
+                            <span id="prediction-text" class="text-xl font-bold mr-2"></span>
+                            <span id="prediction-confidence" class="text-sm text-gray-500"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Details Card -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-info-circle text-purple-600"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold">Details</h3>
+                        </div>
+                        <div id="analysis-details" class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Domain Age:</span>
+                                <span id="domain-age" class="font-medium">Loading...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">SSL Certificate:</span>
+                                <span id="ssl-cert" class="font-medium">Loading...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Domain:</span>
+                                <span id="domain-principal" class="font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Analysis -->
+            <div class="result-card bg-white rounded-xl shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4">Detailed Analysis</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">BERT Model Features</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium">URL Structure</span>
+                                        <span id="url-structure" class="text-sm font-medium">-</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div id="url-structure-bar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium">Domain Reputation</span>
+                                        <span id="domain-reputation" class="text-sm font-medium">-</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div id="domain-reputation-bar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium">Content Analysis</span>
+                                        <span id="content-analysis" class="text-sm font-medium">-</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div id="content-analysis-bar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium">Behavioral Patterns</span>
+                                        <span id="behavioral-patterns" class="text-sm font-medium">-</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div id="behavioral-patterns-bar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">Recommendation</h4>
+                        <div id="recommendation" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
+                            <p>Based on our analysis, we recommend <span id="recommendation-action" class="font-semibold">evaluating the URL</span> before proceeding.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Section -->
+            <div class="result-card bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">Recent Analyses</h3>
+                    <button class="text-blue-600 hover:text-blue-800 flex items-center">
+                        <span>View All</span>
+                        <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table" class="bg-white divide-y divide-gray-200">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <section class="my-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-brain text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-3">BERT AI Model</h3>
+                    <p class="text-gray-600 text-center">Our system uses a pre-trained BERT model fine-tuned for phishing detection, analyzing URL patterns and content with state-of-the-art accuracy.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-database text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-3">Real-time Analysis</h3>
+                    <p class="text-gray-600 text-center">Get instant results with our Flask backend that processes your URL in real-time, providing comprehensive security analysis.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-history text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-3">History Tracking</h3>
+                    <p class="text-gray-600 text-center">All your analyzed URLs are stored securely in our PostgreSQL database, allowing you to review past analyses anytime.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <h3 class="text-xl font-bold mb-4 flex items-center justify-center">
+                    <i class="fas fa-shield-alt mr-2"></i> PhishAlertAI
+                </h3>
+                <p class="text-gray-400 mb-4">Advanced phishing detection powered by BERT AI</p>
+                <div class="flex justify-center space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 PhishAlertAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/script.js"></script>
+</body>
+</html>

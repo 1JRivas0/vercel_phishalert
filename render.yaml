@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: my-python-app
+    env: python
+    plan: starter
+    runtime: python
+    pythonVersion: "3.11.9"  # Especifica la versión de Python aquí
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
